@@ -25,7 +25,7 @@ class Backend(BackendBase):
 
 
     def __init__(self, *args, **kwargs):
-        BackendBase.__init__(*args, **kwargs)
+        BackendBase.__init__(self, *args, **kwargs)
 
         if pygsm is None:
             raise ImportError(

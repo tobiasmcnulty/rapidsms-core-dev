@@ -20,10 +20,10 @@ class BackendBase(object, LoggerMixin):
         return get_class(module, cls)
 
 
-    def __init__ (self, router, name, **kwargs):
+    def __init__ (self, name, **kwargs):
         self._queue = Queue.Queue()
         self._running = False
-        self.router = router
+#        self.router = router
         self.name = name
 
         self._config = kwargs
@@ -46,6 +46,7 @@ class BackendBase(object, LoggerMixin):
 
 
     def start(self):
+        self.info('Starting backend %s' % self)
         try:
             self._running = True
             self.run()
@@ -94,8 +95,8 @@ class BackendBase(object, LoggerMixin):
             conn, text, received_at)
 
 
-    def route(self, msg):
-        return self.router.incoming_message(msg)
+#    def route(self, msg):
+#        return self.router.incoming_message(msg)
 
 
     # TODO: what on earth is this for?
