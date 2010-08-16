@@ -4,6 +4,9 @@
 
 import time
 import Queue
+
+from django.conf import settings
+
 from ..utils.modules import try_import, get_class
 from ..messages.incoming import IncomingMessage
 from ..log.mixin import LoggerMixin
@@ -111,3 +114,16 @@ class BackendBase(object, LoggerMixin):
 
         except Queue.Empty:
             return None
+
+
+def get_backend(backend, module_name=None):
+    """
+    Finds and instantiates the named backend.
+    """
+    if module_name is None:
+        module_name = settings.INSTALLED_BACKENDS[backend].pop("ENGINE")
+    config = settings.INSTALLED_BACKENDS.get(backend, None) or {}
+    cls = BackendBase.find(module_name)
+    if cls is None:
+        raise Exception("Backend module '%s' not found." % module_name)
+    return cls(backend, **config)

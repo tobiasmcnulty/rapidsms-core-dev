@@ -6,7 +6,7 @@ import logging, logging.handlers
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management import call_command
 from django.conf import settings
-from rapidsms.backends.base import BackendBase
+from rapidsms.backends.base import get_backend
 
 
 
@@ -49,10 +49,5 @@ class Command(BaseCommand):
         call_command("update_backends", verbosity=0)
         call_command("update_apps", verbosity=0)
 
-        module_name = settings.INSTALLED_BACKENDS[backend].pop("ENGINE")
-        config = settings.INSTALLED_BACKENDS[backend] or {}
-        cls = BackendBase.find(module_name)
-        if cls is None:
-            raise CommandError("Backend module '%s' not found." % module_name)
-        backend = cls(backend, **config)
+        backend = get_backend(backend)
         backend.start()
