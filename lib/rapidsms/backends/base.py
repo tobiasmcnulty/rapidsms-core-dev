@@ -4,6 +4,9 @@
 
 import time
 import Queue
+
+from django.conf import settings
+
 from ..utils.modules import try_import, get_class
 from ..messages.incoming import IncomingMessage
 from ..log.mixin import LoggerMixin
@@ -20,10 +23,10 @@ class BackendBase(object, LoggerMixin):
         return get_class(module, cls)
 
 
-    def __init__ (self, router, name, **kwargs):
+    def __init__ (self, name, **kwargs):
         self._queue = Queue.Queue()
         self._running = False
-        self.router = router
+#        self.router = router
         self.name = name
 
         self._config = kwargs
@@ -46,6 +49,7 @@ class BackendBase(object, LoggerMixin):
 
 
     def start(self):
+        self.info('Starting backend %s' % self)
         try:
             self._running = True
             self.run()
@@ -94,8 +98,8 @@ class BackendBase(object, LoggerMixin):
             conn, text, received_at)
 
 
-    def route(self, msg):
-        return self.router.incoming_message(msg)
+#    def route(self, msg):
+#        return self.router.incoming_message(msg)
 
 
     # TODO: what on earth is this for?
@@ -110,3 +114,16 @@ class BackendBase(object, LoggerMixin):
 
         except Queue.Empty:
             return None
+
+
+def get_backend(backend, module_name=None):
+    """
+    Finds and instantiates the named backend.
+    """
+    if module_name is None:
+        module_name = settings.INSTALLED_BACKENDS[backend].pop("ENGINE")
+    config = settings.INSTALLED_BACKENDS.get(backend, None) or {}
+    cls = BackendBase.find(module_name)
+    if cls is None:
+        raise Exception("Backend module '%s' not found." % module_name)
+    return cls(backend, **config)

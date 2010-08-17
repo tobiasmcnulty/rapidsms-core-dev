@@ -6,13 +6,17 @@ from .base import BackendBase
 
 
 class BucketBackend(BackendBase):
-    def start(self):
+
+    def __init__(self, *args, **kwargs):
         self.bucket = []
+        super(BucketBackend, self).__init__(*args, **kwargs)
+
+    def start(self):
         BackendBase.start(self)
 
     def receive(self, identity, text):
         msg = self.message(identity, text)
-        self.router.incoming_message(msg)
+        #self.router.incoming_message(msg)
         self.bucket.append(msg)
         return msg
 

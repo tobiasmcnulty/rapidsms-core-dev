@@ -14,8 +14,7 @@ class NewBackend(RapidHttpBacked):
 
 def test_handle_request():
     """ handle_request must return a HttpResponse """
-    router = MockRouter()
-    backend = RapidHttpBacked(name='test', router=router)
+    backend = RapidHttpBacked(name='test')
     response = backend.handle_request(HttpRequest())
     assert_true(isinstance(response, HttpResponse))
 
@@ -23,5 +22,5 @@ def test_handle_request():
 def test_extra_config():
     """ Allow custom configuration """
     router = MockRouter()
-    backend = NewBackend(name='test', router=router, username='rapidsms')
+    backend = NewBackend(name='test', username='rapidsms')
     assert_equals('rapidsms', backend.username)
