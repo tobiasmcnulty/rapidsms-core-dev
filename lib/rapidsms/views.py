@@ -2,6 +2,8 @@
 # vim: ai ts=4 sts=4 et sw=4
 
 
+from rapidsms.backends.base import get_backend
+
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.views.decorators.http import require_GET
@@ -22,3 +24,14 @@ def login(req, template_name="rapidsms/login.html"):
 
 def logout(req, template_name="rapidsms/loggedout.html"):
     return django_logout(req, **{"template_name" : template_name})
+
+
+def handle_message(request):
+    identity = request.GET.get('identity')
+    text = request.GET.get('msg')
+    backend = get_backend('bucket')
+    msg = backend.message(identity, text)
+    router = Router()
+    router.incoming(msg)
+    return HttpResponse('ok')
+    

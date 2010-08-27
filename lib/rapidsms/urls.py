@@ -7,4 +7,5 @@ from . import views
 urlpatterns = patterns('',
     url(r'^accounts/login/$', views.login),
     url(r'^accounts/logout/$', views.logout),
+    url(r'^handle-message/$', views.handle_message, name='handle_message'),
 )
